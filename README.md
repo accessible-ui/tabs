@@ -1,7 +1,7 @@
 <hr>
 <div align="center">
   <h1 align="center">
-    @accessible/tabs
+    &lt;Tabs&gt;
   </h1>
 </div>
 
@@ -12,11 +12,11 @@
   <a aria-label="Types" href="https://www.npmjs.com/package/@accessible/tabs">
     <img alt="Types" src="https://img.shields.io/npm/types/@accessible/tabs?style=for-the-badge&labelColor=24292e">
   </a>
-  <a aria-label="Code coverage report" href="https://codecov.io/gh/accessible-ui/accessible">
-    <img alt="Code coverage" src="https://img.shields.io/codecov/c/gh/accessible-ui/accessible?style=for-the-badge&labelColor=24292e">
+  <a aria-label="Code coverage report" href="https://codecov.io/gh/accessible-ui/tabs">
+    <img alt="Code coverage" src="https://img.shields.io/codecov/c/gh/accessible-ui/tabs?style=for-the-badge&labelColor=24292e">
   </a>
-  <a aria-label="Build status" href="https://travis-ci.org/accessible-ui/accessible">
-    <img alt="Build status" src="https://img.shields.io/travis/accessible-ui/accessible?style=for-the-badge&labelColor=24292e">
+  <a aria-label="Build status" href="https://travis-ci.org/accessible-ui/tabs">
+    <img alt="Build status" src="https://img.shields.io/travis/accessible-ui/tabs?style=for-the-badge&labelColor=24292e">
   </a>
   <a aria-label="NPM version" href="https://www.npmjs.com/package/@accessible/tabs">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/@accessible/tabs?style=for-the-badge&labelColor=24292e">
@@ -29,12 +29,31 @@
 <pre align="center">npm i @accessible/tabs</pre>
 <hr>
 
-An accessible and versatile tabs component for React
+An accessible and versatile tabs component for React modeled after
+the [WAI-ARIA example taught here](https://www.w3.org/TR/wai-aria-practices/examples/tabs/tabs-1/tabs.html).
 
 ## Quick Start
 
 ```jsx harmony
-import _ from '@accessible/tabs'
+import {Tabs, TabList, Tab, Panel} from '@accessible/tabs'
+
+const Component = () => (
+  <Tabs defaultActive={0} manualActivation>
+    <TabList>
+      <div>
+        <Tab>
+          <button>Abstract</button>
+        </Tab>
+        <Tab>
+          <button>References</button>
+        </Tab>
+      </div>
+    </TabList>
+
+    <Panel>Abstract stuff</Panel>
+    <Panel>Reference stuff</Panel>
+  </Tabs>
+)
 ```
 
 ## API

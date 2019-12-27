@@ -1,16 +1,26 @@
 {
   "name": "@accessible/tabs",
   "version": "1.0.0",
-  "homepage": "https://github.com/accessible-ui/accessible#readme",
-  "repository": "github:accessible-ui/accessible",
-  "bugs": "https://github.com/accessible-ui/accessible/issues",
+  "homepage": "https://github.com/accessible-ui/tabs#readme",
+  "repository": "github:accessible-ui/tabs",
+  "bugs": "https://github.com/accessible-ui/tabs/issues",
   "author": "Jared Lunde <jared.lunde@gmail.com> (https://jaredLunde.com)",
   "license": "MIT",
-  "description": "",
+  "description": "An accessible and versatile tabs component for React",
   "keywords": [
     "react",
     "react component",
-    "tabs"
+    "tabs",
+    "accessible tabs",
+    "a11y tabs",
+    "react a11y tabs",
+    "react accessible tabs",
+    "react tabs",
+    "react tabs component",
+    "a11y",
+    "react aria tabs",
+    "aria",
+    "aria tabs"
   ],
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
@@ -74,7 +84,14 @@
     "ts-jest": "latest",
     "typescript": "latest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@accessible/use-conditional-focus": "^1.0.1",
+    "@accessible/use-id": "^1.0.2",
+    "@accessible/use-keycode": "^1.0.3",
+    "@react-hook/merged-ref": "^1.0.8",
+    "@react-hook/passive-layout-effect": "^1.0.2",
+    "clsx": "^1.0.4"
+  },
   "peerDependencies": {
     "prop-types": ">=15.6",
     "react": ">=16.8",
