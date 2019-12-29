@@ -66,7 +66,7 @@ const cloneChildrenWithIndex = (
 
 export interface TabsContextValue {
   tabs: TabState
-  registerTab: (index: number, element: HTMLElement, id?: string) => () => void
+  registerTab: (index: number, element: HTMLElement, id?: string, disabled?: boolean) => () => void
   active: number | undefined
   activate: (tab: number | undefined) => void
   manualActivation: boolean
@@ -95,6 +95,7 @@ export type TabState = (
   | {
       element?: HTMLElement
       id?: string
+      disabled?: boolean
     }
   | undefined
 )[]
@@ -105,6 +106,7 @@ type TabAction =
       index: number
       element: HTMLElement
       id?: string
+      disabled?: boolean
     }
   | {
       type: 'unregister'
@@ -127,11 +129,12 @@ export const Tabs: React.FC<TabsProps> = ({
         if (
           current &&
           action.element === current.element &&
-          action.id === current.id
+          action.id === current.id &&
+          action.disabled === current.disabled
         )
           return state
         state = state.slice(0)
-        state[index] = {element: action.element, id: action.id}
+        state[index] = {element: action.element, id: action.id, disabled: action.disabled}
       } else if (action.type === 'unregister') {
         state = state.slice(0)
         state[index] = void 0
@@ -157,8 +160,8 @@ export const Tabs: React.FC<TabsProps> = ({
   const context = useMemo(
     () => ({
       tabs,
-      registerTab: (index: number, element: HTMLElement, id?: string) => {
-        dispatchTabs({type: 'register', index, element, id})
+      registerTab: (index: number, element: HTMLElement, id?: string, disabled?: boolean) => {
+        dispatchTabs({type: 'register', index, element, id, disabled})
         return () => dispatchTabs({type: 'unregister', index})
       },
       active: nextActive,
@@ -192,8 +195,9 @@ export const useTab = index => {
         id: tabs[index]?.id,
         tabRef: tabs[index]?.element,
         index: index as number,
-        activate: () => activate(index),
+        activate: () => !this.disabled && activate(index),
         isActive: index === active,
+        disabled: tabs[index]?.disabled || false,
       }),
       [tabs, index, active]
     )
@@ -207,6 +211,7 @@ export const useTab = index => {
 export interface TabProps {
   id?: string
   index?: number
+  disabled?: boolean
   activeClass?: string
   inactiveClass?: string
   activeStyle?: React.CSSProperties
@@ -218,6 +223,7 @@ export interface TabProps {
 export const Tab: React.FC<TabProps> = ({
   id,
   index,
+  disabled = false,
   activeClass,
   inactiveClass,
   activeStyle,
@@ -253,14 +259,14 @@ export const Tab: React.FC<TabProps> = ({
   )
 
   useEffect(
-    () => registerTab(index as number, triggerRef.current as HTMLElement, id),
-    [id]
+    () => registerTab(index as number, triggerRef.current as HTMLElement, id, disabled),
+    [id, disabled]
   )
 
   return cloneElement(children, {
     'aria-controls': id,
-    'aria-selected': String(isActive),
-    'aria-disabled': String(isActive),
+    'aria-selected': '' + isActive,
+    'aria-disabled': '' + (isActive || disabled),
     role: 'tab',
     className:
       clsx(children.props.className, isActive ? activeClass : inactiveClass) ||
