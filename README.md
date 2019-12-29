@@ -40,7 +40,7 @@ import {Tabs, TabList, Tab, Panel} from '@accessible/tabs'
 const Component = () => (
   <Tabs defaultActive={0} manualActivation>
     <TabList>
-      <div aria-label='Some research thing'>
+      <div aria-label="Some research thing">
         <Tab>
           <button>Abstract</button>
         </Tab>

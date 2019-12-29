@@ -143,6 +143,7 @@ export const Tabs: React.FC<TabsProps> = ({
   )
   const [userActive, setActive] = useState<number | undefined>(defaultActive)
   const nextActive = typeof active === 'undefined' ? userActive : active
+  const prevActive = useRef<number | undefined>(nextActive)
 
   if (__DEV__) {
     if (nextActive === void 0) {
@@ -168,7 +169,8 @@ export const Tabs: React.FC<TabsProps> = ({
   )
 
   useEffect(() => {
-    onChange?.(nextActive)
+    prevActive.current !== nextActive && onChange?.(nextActive)
+    prevActive.current = nextActive
   }, [nextActive])
 
   return (
