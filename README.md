@@ -40,7 +40,7 @@ import {Tabs, TabList, Tab, Panel} from '@accessible/tabs'
 const Component = () => (
   <Tabs defaultActive={0} manualActivation>
     <TabList>
-      <div>
+      <div aria-label='Some research thing'>
         <Tab>
           <button>Abstract</button>
         </Tab>
@@ -50,8 +50,12 @@ const Component = () => (
       </div>
     </TabList>
 
-    <Panel>Abstract stuff</Panel>
-    <Panel>Reference stuff</Panel>
+    <Panel>
+      <div>Abstract body</div>
+    </Panel>
+    <Panel>
+      <div>References body</div>
+    </Panel>
   </Tabs>
 )
 ```

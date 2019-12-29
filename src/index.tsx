@@ -1,6 +1,7 @@
 import React, {
   cloneElement,
   useState,
+  useReducer,
   useRef,
   useMemo,
   useEffect,
@@ -8,59 +9,66 @@ import React, {
 } from 'react'
 import {useKeycodes} from '@accessible/use-keycode'
 import useConditionalFocus from '@accessible/use-conditional-focus'
+import useId from '@accessible/use-id'
 import useMergedRef from '@react-hook/merged-ref'
 import useLayoutEffect from '@react-hook/passive-layout-effect'
-import useId from '@accessible/use-id'
 import clsx from 'clsx'
 
 const __DEV__ =
   typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
 
-const replaceChildren1d = (
-  Element: React.ReactElement | JSX.Element,
-  cloneProps:
-    | Record<string, any>
-    | ((current: Record<string, any>) => Record<string, any>),
-  match: (child: React.ReactElement) => boolean
-): boolean => {
-  if (!React.isValidElement(Element)) return false
-  const found: React.ReactElement[] = []
-
-  React.Children.forEach(Element.props.children, (child, index) => {
-    if (React.isValidElement(child)) {
-      if (match(child))
-        found.push(
-          cloneElement(
-            child,
-            Object.assign(
-              {key: index},
-              typeof cloneProps === 'function'
-                ? cloneProps(child.props as Record<string, any>)
-                : cloneProps
-            )
-          )
-        )
-      else if (found.length === 0)
-        replaceChildren1d(
-          (child.props as Record<string, any>).children,
-          cloneProps,
-          match
-        )
+// An optimized function for adding an `index` prop to elements of a Tab or
+// Panel type. All tabs must be on the same child depth level as other tabs,
+// same with panels. Once one tab or panel is found, it will not traverse
+// deeper into the tree. Using this in favor of something more generalized
+// in order to not hurt render performance on large trees.
+const cloneChildrenWithIndex = (
+  elements: React.ReactNode | React.ReactNode[],
+  type: typeof Panel | typeof Tab
+): React.ReactNode[] | React.ReactNode => {
+  let index = 0
+  let didUpdate = false
+  const children = React.Children.map(elements, child => {
+    // bails out if not an element object
+    if (!React.isValidElement(child)) return child
+    // bails out if certainly the wrong type
+    if (
+      (type === Panel && (child.type === TabList || child.type === Tab)) ||
+      (type === Tab && child.type === Panel)
+    )
+      return child
+    // found a match
+    if (child.type === type) {
+      // bail out if the indexes are user-provided
+      if (child.props.index !== void 0) {
+        index = child.props.index + 1
+        return child
+      } else {
+        didUpdate = true
+        return cloneElement(child, {index: index++})
+      }
     }
+    // only checks the children if we're not on a depth with tabs/panels
+    if (index === 0) {
+      const nextChildren = cloneChildrenWithIndex(child.props.children, type)
+      if (nextChildren === child.props.children) return child
+      else {
+        didUpdate = true
+        return cloneElement(child, void 0, nextChildren)
+      }
+    }
+
+    return child
   })
 
-  cloneElement(Element, void 0, found)
-  return found.length > 0
+  return !didUpdate ? elements : children.length === 1 ? children[0] : children
 }
 
 export interface TabsContextValue {
-  tabs: (HTMLElement | undefined)[]
-  registerTab: (index: number, trigger: HTMLElement) => () => void
-  panels: (HTMLElement | undefined)[]
-  registerPanel: (index: number, panel: HTMLElement) => () => void
+  tabs: TabState
+  registerTab: (index: number, element: HTMLElement, id?: string) => () => void
   active: number | undefined
   activate: (tab: number | undefined) => void
-  isActive: (tab: number | undefined) => boolean
   manualActivation: boolean
 }
 
@@ -83,6 +91,26 @@ export interface TabsProps {
     | JSX.Element[]
 }
 
+export type TabState = (
+  | {
+      element?: HTMLElement
+      id?: string
+    }
+  | undefined
+)[]
+
+type TabAction =
+  | {
+      type: 'register'
+      index: number
+      element: HTMLElement
+      id?: string
+    }
+  | {
+      type: 'unregister'
+      index: number
+    }
+
 export const Tabs: React.FC<TabsProps> = ({
   active,
   defaultActive = 0,
@@ -90,14 +118,36 @@ export const Tabs: React.FC<TabsProps> = ({
   onChange,
   children,
 }) => {
-  const [tabs, setTabs] = useState<(HTMLElement | undefined)[]>([])
+  const [tabs, dispatchTabs] = useReducer(
+    (state: TabState, action: TabAction) => {
+      const {index} = action
+
+      if (action.type === 'register') {
+        const current = state[index]
+        if (
+          current &&
+          action.element === current.element &&
+          action.id === current.id
+        )
+          return state
+        state = state.slice(0)
+        state[index] = {element: action.element, id: action.id}
+      } else if (action.type === 'unregister') {
+        state = state.slice(0)
+        state[index] = void 0
+      }
+
+      return state
+    },
+    []
+  )
   const [userActive, setActive] = useState<number | undefined>(defaultActive)
   const nextActive = typeof active === 'undefined' ? userActive : active
 
   if (__DEV__) {
     if (nextActive === void 0) {
       throw new Error(
-        `Tabs requires at least one tab to be open, but there were no active tabs. ` +
+        `Tabs requires at least one tab to be active, but there were no active tabs. ` +
           `Try setting a \`defaultActive\` property.`
       )
     }
@@ -106,27 +156,12 @@ export const Tabs: React.FC<TabsProps> = ({
   const context = useMemo(
     () => ({
       tabs,
-      registerTab: (index: number, trigger: HTMLElement) => {
-        setTabs(current => {
-          const next = current.slice(0)
-          next[index] = trigger
-          return next
-        })
-
-        return () =>
-          setTabs(current => {
-            if (current[index] === void 0) return current
-            const next = current.slice(0)
-            next[index] = void 0
-            return next
-          })
+      registerTab: (index: number, element: HTMLElement, id?: string) => {
+        dispatchTabs({type: 'register', index, element, id})
+        return () => dispatchTabs({type: 'unregister', index})
       },
-      panels: [],
-      registerPanel: () => () => {},
       active: nextActive,
-      activate: (index: number | undefined) => setActive(index),
-      isActive: (index: number | undefined) =>
-        index !== void 0 && nextActive === index,
+      activate: setActive,
       manualActivation,
     }),
     [tabs, nextActive, manualActivation]
@@ -138,229 +173,187 @@ export const Tabs: React.FC<TabsProps> = ({
 
   return (
     <TabsContext.Provider value={context}>
-      {React.Children.map(children, (child_, index) => {
-        const child = child_ as React.ReactElement
-        const {index: childIndex} = child.props
-
-        return cloneElement(child, {
-          key: child.key === null ? index : child.key,
-          index: childIndex !== void 0 ? childIndex : index,
-        })
-      })}
+      {cloneChildrenWithIndex(cloneChildrenWithIndex(children, Tab), Panel)}
     </TabsContext.Provider>
   )
 }
 
-export interface TabContextValue {
-  isOpen: boolean
-  open: () => void
-  id?: string
-  index: number
-  triggerRef: React.MutableRefObject<HTMLElement | null>
-}
-
 export interface TabControls {
-  open: () => void
+  activate: () => void
 }
 
 // @ts-ignore
-export const TabContext: React.Context<TabContextValue> = React.createContext(
-    {}
-  ),
-  {Consumer: TabConsumer} = TabContext,
-  useTab = () => useContext<TabContextValue>(TabContext),
-  useIsOpen = () => useTab().isOpen,
-  useControls = (): TabControls => {
-    const {open} = useTab()
-    return {open}
+export const useTab = index => {
+    const {tabs, activate, active} = useContext(TabsContext)
+    return useMemo(
+      () => ({
+        id: tabs[index]?.id,
+        tabRef: tabs[index]?.element,
+        index: index as number,
+        activate: () => activate(index),
+        isActive: index === active,
+      }),
+      [tabs, index, active]
+    )
+  },
+  useIsActive = (index: number) => useTab(index).isActive,
+  useControls = (index: number): TabControls => {
+    const {activate} = useTab(index)
+    return {activate}
   }
 
 export interface TabProps {
   id?: string
   index?: number
-  openClass?: string
-  closedClass?: string
-  openStyle?: React.CSSProperties
-  closedStyle?: React.CSSProperties
-  children:
-    | React.ReactNode
-    | React.ReactNode[]
-    | JSX.Element[]
-    | JSX.Element
-    | ((context: TabContextValue) => React.ReactNode)
+  activeClass?: string
+  inactiveClass?: string
+  activeStyle?: React.CSSProperties
+  inactiveStyle?: React.CSSProperties
+  onDelete?: (event: KeyboardEvent) => void
+  children: React.ReactElement | JSX.Element
 }
 
 export const Tab: React.FC<TabProps> = ({
   id,
   index,
-  openClass,
-  closedClass,
-  openStyle,
-  closedStyle,
+  activeClass,
+  inactiveClass,
+  activeStyle,
+  inactiveStyle,
+  onDelete = () => {},
   children,
 }) => {
-  const {isActive, activate, registerTab} = useTabs()
-  const triggerRef = useRef<HTMLElement>(null)
   id = useId(id)
-
-  useEffect(
-    () => registerTab(index as number, triggerRef.current as HTMLElement),
-    []
-  )
-
-  const context = useMemo(
-    () => ({
-      id,
-      index: index as number,
-      open: () => activate(index),
-      isOpen: isActive(index),
-      triggerRef,
-    }),
-    [id, index, activate, isActive]
-  )
-
-  // @ts-ignore
-  children = typeof children === 'function' ? children(context) : children
-
-  return (
-    <TabContext.Provider
-      value={context}
-      children={
-        <Trigger
-          openClass={openClass}
-          closedClass={closedClass}
-          openStyle={openStyle}
-          closedStyle={closedStyle}
-        >
-          {/* ts-ignore*/}
-          {children}
-        </Trigger>
-      }
-    />
-  )
-}
-
-/*export */ interface TriggerProps {
-  openClass?: string
-  closedClass?: string
-  openStyle?: React.CSSProperties
-  closedStyle?: React.CSSProperties
-  children: any
-}
-
-/*export */ const Trigger: React.FC<TriggerProps> = ({
-  openClass,
-  closedClass,
-  openStyle,
-  closedStyle,
-  children,
-}) => {
-  const {tabs, isActive} = useTabs()
-  const {isOpen, id, index, open, triggerRef} = useTab()
+  const {registerTab} = useTabs()
+  const triggerRef = useRef<HTMLElement>(null)
+  const {tabs, manualActivation} = useTabs()
+  const {isActive, activate} = useTab(index)
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
     triggerRef,
     useKeycodes({
       // space bar
-      32: open,
+      32: activate,
       // enter
-      13: open,
+      13: activate,
       // right arrow
-      38: () => focusNext(tabs, index),
+      39: () => focusNext(tabs, index as number),
       // left arrow
-      37: () => focusPrev(tabs, index),
+      37: () => focusPrev(tabs, index as number),
       // home
-      36: () => tabs[0]?.focus(),
+      36: () => tabs[0]?.element?.focus(),
       // end
-      35: () => tabs[tabs.length - 1]?.focus(),
+      35: () => tabs[tabs.length - 1]?.element?.focus(),
+      // delete
+      46: onDelete,
     })
+  )
+
+  useEffect(
+    () => registerTab(index as number, triggerRef.current as HTMLElement, id),
+    [id]
   )
 
   return cloneElement(children, {
     'aria-controls': id,
-    'aria-selected': String(isOpen),
-    'aria-disabled': String(isOpen && isActive(index)),
+    'aria-selected': String(isActive),
+    'aria-disabled': String(isActive),
+    role: 'tab',
     className:
-      clsx(children.props.className, isOpen ? openClass : closedClass) ||
+      clsx(children.props.className, isActive ? activeClass : inactiveClass) ||
       void 0,
     style: Object.assign(
       {},
       children.props.style,
-      isOpen ? openStyle : closedStyle
+      isActive ? activeStyle : inactiveStyle
     ),
-    tabIndex:
-      children.props.tabIndex !== void 0
-        ? children.props.tabIndex
-        : isOpen
-        ? 0
-        : -1,
+    tabIndex: children.props.hasOwnProperty('tabIndex')
+      ? children.props.tabIndex
+      : isActive
+      ? 0
+      : -1,
+    onFocus: e => {
+      !manualActivation && activate()
+      children.props.onFocus?.(e)
+    },
     onClick: e => {
-      open()
+      activate()
       children.props.onClick?.(e)
     },
     ref,
   })
 }
 
-export const focusNext = (
-  tabs: (HTMLElement | undefined)[],
-  currentIndex: number
-) => {
-  if (currentIndex === tabs.length - 1) tabs[0]?.focus()
-  else tabs[currentIndex + 1]?.focus()
+const focusNext = (tabs: TabState, currentIndex: number) => {
+  if (currentIndex === tabs.length - 1) tabs[0]?.element?.focus()
+  else tabs[currentIndex + 1]?.element?.focus()
 }
 
-export const focusPrev = (
-  tabs: (HTMLElement | undefined)[],
-  currentIndex: number
-) => {
-  if (currentIndex === 0) tabs[tabs.length - 1]?.focus()
-  else tabs[currentIndex - 1]?.focus()
+const focusPrev = (tabs: TabState, currentIndex: number) => {
+  if (currentIndex === 0) tabs[tabs.length - 1]?.element?.focus()
+  else tabs[currentIndex - 1]?.element?.focus()
 }
+
+export interface TabListProps {
+  children: React.ReactElement
+}
+
+export const TabList: React.FC<TabListProps> = ({children}) =>
+  cloneElement(children, {
+    role: 'tablist',
+  })
 
 export interface PanelProps {
-  openClass?: string
-  closedClass?: string
-  openStyle?: React.CSSProperties
-  closedStyle?: React.CSSProperties
+  index?: number
+  activeClass?: string
+  inactiveClass?: string
+  activeStyle?: React.CSSProperties
+  inactiveStyle?: React.CSSProperties
   children: React.ReactElement
 }
 
 export const Panel: React.FC<PanelProps> = ({
-  openClass,
-  closedClass,
-  openStyle,
-  closedStyle,
+  index,
+  activeClass,
+  inactiveClass,
+  activeStyle,
+  inactiveStyle,
   children,
 }) => {
-  const {id, isOpen} = useTab()
-  // handles closing the modal when the ESC key is pressed
-  const prevOpen = useRef<boolean>(isOpen)
-  const focusRef = useConditionalFocus(!prevOpen.current && isOpen, true)
+  const {isActive, id} = useTab(index)
+  const {manualActivation} = useTabs()
+  const prevActive = useRef<boolean>(isActive)
+  const focusRef = useConditionalFocus(
+    manualActivation && !prevActive.current && isActive,
+    true
+  )
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
     focusRef
   )
-  // ensures the accordion content won't be granted the window's focus
-  // by default
+  // ensures the tab panel won't be granted the window's focus
+  // by default, but receives focus when the visual state changes to
+  // active
   useLayoutEffect(() => {
-    prevOpen.current = isOpen
-  }, [isOpen])
+    prevActive.current = isActive
+  }, [isActive, index])
 
   return cloneElement(children, {
-    'aria-hidden': `${!isOpen}`,
+    'aria-hidden': `${!isActive}`,
     id,
     className:
-      clsx(children.props.className, isOpen ? openClass : closedClass) ||
+      clsx(children.props.className, isActive ? activeClass : inactiveClass) ||
       void 0,
     style: Object.assign(
-      {visibility: isOpen ? 'visible' : 'hidden'},
+      {visibility: isActive ? 'visible' : 'hidden'},
       children.props.style,
-      isOpen ? openStyle : closedStyle
+      isActive ? activeStyle : inactiveStyle
     ),
-    tabIndex: children.props.tabIndex !== void 0 ? children.props.tabIndex : 0,
+    tabIndex: children.props.hasOwnProperty('tabIndex')
+      ? children.props.tabIndex
+      : 0,
     ref,
   })
 }
@@ -368,7 +361,7 @@ export const Panel: React.FC<PanelProps> = ({
 /* istanbul ignore next */
 if (__DEV__) {
   Tabs.displayName = 'Tabs'
+  TabList.displayName = 'TabList'
   Tab.displayName = 'Tab'
   Panel.displayName = 'Panel'
-  Trigger.displayName = 'Trigger'
 }
