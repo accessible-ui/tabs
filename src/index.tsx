@@ -222,6 +222,8 @@ export const useTab = index => {
     return {activate}
   }
 
+const noop = () => {}
+
 export interface TabProps {
   id?: string
   index?: number
@@ -242,7 +244,7 @@ export const Tab: React.FC<TabProps> = ({
   inactiveClass,
   activeStyle,
   inactiveStyle,
-  onDelete = () => {},
+  onDelete = noop,
   children,
 }) => {
   id = useId(id)
@@ -254,22 +256,25 @@ export const Tab: React.FC<TabProps> = ({
     // @ts-ignore
     children.ref,
     triggerRef,
-    useKeycodes({
-      // space bar
-      32: activate,
-      // enter
-      13: activate,
-      // right arrow
-      39: () => focusNext(tabs, index as number),
-      // left arrow
-      37: () => focusPrev(tabs, index as number),
-      // home
-      36: () => tabs[0]?.element?.focus(),
-      // end
-      35: () => tabs[tabs.length - 1]?.element?.focus(),
-      // delete
-      46: onDelete,
-    })
+    useKeycodes(
+      {
+        // space bar
+        32: activate,
+        // enter
+        13: activate,
+        // right arrow
+        39: () => focusNext(tabs, index as number),
+        // left arrow
+        37: () => focusPrev(tabs, index as number),
+        // home
+        36: () => tabs[0]?.element?.focus(),
+        // end
+        35: () => tabs[tabs.length - 1]?.element?.focus(),
+        // delete
+        46: onDelete,
+      },
+      [activate, tabs, index, onDelete]
+    )
   )
 
   useEffect(
