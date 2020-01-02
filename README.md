@@ -65,7 +65,6 @@ const Component = () => (
 ## API
 
 ### Components
-<<<<<<< HEAD
 
 | Component               | Description                                                                                                                                                                                                                                                                               |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -101,43 +100,6 @@ This component creates the context for your tabs and contains some configuration
 
 ### `<TabList>`
 
-=======
-
-| Component               | Description                                                                                                                                                                                                                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`<Tabs>`](#tabs)       | This component creates the context for your tabs and contains some configuration options. You'll need to add [`<Tab>`](#tab) and [`<Panel>`](#panel) as children in order to actually create tabs.                                                                                        |
-| [`<TabList>`](#tablist) | The component adds `role='tablist'` to its child component.                                                                                                                                                                                                                               |
-| [`<Tab>`](#tab)         | This component clones any React element and turns it into a tab that controls the visible state of a [`<Panel>`](#panel). It must be a child of [`<Tabs>`](#tabs) and all tabs must be adjacent in the tree. Each tab has a corresponding [`<Panel>`](#panel) that shares the same index. |
-| [`<Panel>`](#panel)     | This component clones its child and turns it into a panel that corresponds to a [`<Tab>`](#tab) with the same index. All panels must be adjacent in the tree unless an `index` prop is defined.                                                                                           |
-
-### Hooks
-
-| Hook                                        | Description                                                                 |
-| ------------------------------------------- | --------------------------------------------------------------------------- |
-| [`useTabs()`](#usetabs)                     | This hook returns the value of the [TabsContext object](#tabscontextvalue). |
-| [`useTab()`](#usetabindex-number)           | This hook returns the value of the [TabContext object](#tabcontextvalue).   |
-| [`useControls()`](#usecontrolsindex-number) | This hook returns a [`<Tab>`'s](#tab) `activate` function.                  |
-| [`useDisabled()`](#usedisabledindex-number) | This hook returns a [`<Tab>`'s](#tab) `disabled` value.                     |
-| [`useIsActive()`](#useisactiveindex-number) | This hook returns a [`<Tab>`'s](#tab) `isActive` value.                     |
-
-### `<Tabs>`
-
-This component creates the context for your tabs and contains some configuration options. You'll need to add
-[`<Tab>`](#tab) and [`<Panel>`](#panel) as children in order to actually create tabs.
-
-#### Props
-
-| Prop             | Type                       | Default     | Required? | Description                                                                                                                                                                                                                             |
-| ---------------- | -------------------------- | ----------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| defaultActive    | `number`                   | `0`         | No        | The [`<Tab>`](#tab) index you want active by default.                                                                                                                                                                                   |
-| active           | `number`                   | `undefined` | No        | Makes this a controlled component where the `activate` control has no effect. The tab index defined here is always the one that is active.                                                                                              |
-| manualActivation | `boolean`                  | `false`     | No        | By default this component opens tabs automatically when using keyboard navigation to switch between tabs. By setting this to `true`, the user will have to use the `space` or `enter` key to activate the tab after the tab is focused. |
-| onChange         | `(active: number) => void` | `undefined` | No        | Called each time the active tab changes. It provides the active tab `index` as its only argument.                                                                                                                                       |
-| children         | `React.ReactElement[]`     | `undefined` | Yes       | You can define any children here with some caveats listed elsewhere.                                                                                                                                                                    |
-
-### `<TabList>`
-
->>>>>>> Docs
 #### Props
 
 | Prop     | Type                 | Default     | Required? | Description                                                                      |
