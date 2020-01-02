@@ -73,7 +73,7 @@ export interface TabsContextValue {
     disabled?: boolean
   ) => () => void
   active: number | undefined
-  activate: (tab: number | undefined) => void
+  activate: (index: number | undefined) => void
   manualActivation: boolean
 }
 
@@ -201,8 +201,17 @@ export interface TabControls {
   activate: () => void
 }
 
+interface TabContextValue {
+  id?: string
+  tabRef?: HTMLElement
+  index: number
+  activate: () => void
+  isActive: boolean
+  disabled: boolean
+}
+
 // @ts-ignore
-export const useTab = index => {
+export const useTab = (index: number): TabContextValue => {
     const {tabs, activate, active} = useContext(TabsContext)
     return useMemo(
       () => ({
@@ -217,6 +226,7 @@ export const useTab = index => {
     )
   },
   useIsActive = (index: number) => useTab(index).isActive,
+  useDisabled = (index: number) => useTab(index).disabled,
   useControls = (index: number): TabControls => {
     const {activate} = useTab(index)
     return {activate}
@@ -251,7 +261,7 @@ export const Tab: React.FC<TabProps> = ({
   const {registerTab} = useTabs()
   const triggerRef = useRef<HTMLElement>(null)
   const {tabs, manualActivation} = useTabs()
-  const {isActive, activate} = useTab(index)
+  const {isActive, activate} = useTab(index as number)
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
@@ -354,7 +364,7 @@ export const Panel: React.FC<PanelProps> = ({
   inactiveStyle,
   children,
 }) => {
-  const {isActive, id} = useTab(index)
+  const {isActive, id} = useTab(index as number)
   const {manualActivation} = useTabs()
   const prevActive = useRef<boolean>(isActive)
   const focusRef = useConditionalFocus(
