@@ -96,7 +96,7 @@ This component creates the context for your tabs and contains some configuration
 | active           | `number`                   | `undefined` | No        | Makes this a controlled component where the `activate` control has no effect. The tab index defined here is always the one that is active.                                                                                              |
 | manualActivation | `boolean`                  | `false`     | No        | By default this component opens tabs automatically when using keyboard navigation to switch between tabs. By setting this to `true`, the user will have to use the `space` or `enter` key to activate the tab after the tab is focused. |
 | onChange         | `(active: number) => void` | `undefined` | No        | Called each time the active tab changes. It provides the active tab `index` as its only argument.                                                                                                                                       |
-| children         | `React.ReactElement[]`     | `undefined` | Yes       | You can define any children here with some caveats listed elsewhere.                                                                                                                                                                    |
+| children         | `React.ReactNode[]`        | `undefined` | Yes       | You can define any children here with some caveats listed elsewhere.                                                                                                                                                                    |
 
 ### `<TabList>`
 
@@ -252,7 +252,7 @@ This hook returns the value of the [TabsContext object](#tabscontextvalue). This
 ```typescript
 interface TabsContextValue {
   // An array of tabs that have been registered
-  tabs: TabState
+  tabs: TabState[]
   // Registers a new tab
   registerTab: (
     index: number,
@@ -268,14 +268,13 @@ interface TabsContextValue {
   manualActivation: boolean
 }
 
-type TabState = (
+type TabState =
   | {
       element?: HTMLElement
       id?: string
       disabled?: boolean
     }
   | undefined
-)[]
 ```
 
 ## LICENSE

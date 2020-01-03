@@ -1,0 +1,227 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Tab> should unregister tabs: one tab 1`] = `
+<DocumentFragment>
+  <button
+    aria-controls="🅰32"
+    aria-disabled="true"
+    aria-selected="true"
+    data-testid="btn2"
+    role="tab"
+    tabindex="0"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Tab> should unregister tabs: two tabs 1`] = `
+<DocumentFragment>
+  <button
+    aria-controls="🅰32"
+    aria-disabled="true"
+    aria-selected="true"
+    data-testid="btn1"
+    role="tab"
+    tabindex="0"
+  />
+  <button
+    aria-controls="🅰33"
+    aria-disabled="false"
+    aria-selected="false"
+    data-testid="btn2"
+    role="tab"
+    tabindex="-1"
+  />
+</DocumentFragment>
+`;
+
+exports[`<TabList> should add role=tablist 1`] = `
+<DocumentFragment>
+  <div
+    role="tablist"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should render child tabs and panels 1`] = `
+<DocumentFragment>
+  <div
+    aria-controls="🅰0"
+    aria-disabled="true"
+    aria-selected="true"
+    role="tab"
+    tabindex="0"
+  />
+  <div
+    aria-hidden="false"
+    id="🅰0"
+    style="visibility: visible;"
+    tabindex="0"
+  />
+  some string
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should render child tabs and panels even when nested 1`] = `
+<DocumentFragment>
+  <div>
+    <div>
+      <div
+        aria-controls="🅰1"
+        aria-disabled="true"
+        aria-selected="true"
+        role="tab"
+        tabindex="0"
+      />
+      <div
+        aria-controls="🅰2"
+        aria-disabled="false"
+        aria-selected="false"
+        role="tab"
+        tabindex="-1"
+      />
+    </div>
+  </div>
+  <div>
+    <div
+      aria-hidden="false"
+      id="🅰1"
+      style="visibility: visible;"
+      tabindex="0"
+    />
+    <div
+      aria-hidden="true"
+      id="🅰2"
+      style="visibility: hidden;"
+      tabindex="-1"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should respond to active prop: 0=active, 1=inactive 1`] = `
+<DocumentFragment>
+  <div
+    aria-controls="🅰5"
+    aria-disabled="true"
+    aria-selected="true"
+    role="tab"
+    tabindex="0"
+  />
+  <div
+    aria-controls="🅰6"
+    aria-disabled="false"
+    aria-selected="false"
+    role="tab"
+    tabindex="-1"
+  />
+  <div
+    aria-hidden="false"
+    id="🅰5"
+    style="visibility: visible;"
+    tabindex="0"
+  />
+  <div
+    aria-hidden="true"
+    id="🅰6"
+    style="visibility: hidden;"
+    tabindex="-1"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should respond to active prop: 0=inactive, 1=active 1`] = `
+<DocumentFragment>
+  <div
+    aria-controls="🅰5"
+    aria-disabled="false"
+    aria-selected="false"
+    role="tab"
+    tabindex="-1"
+  />
+  <div
+    aria-controls="🅰6"
+    aria-disabled="true"
+    aria-selected="true"
+    role="tab"
+    tabindex="0"
+  />
+  <div
+    aria-hidden="true"
+    id="🅰5"
+    style="visibility: hidden;"
+    tabindex="-1"
+  />
+  <div
+    aria-hidden="false"
+    id="🅰6"
+    style="visibility: visible;"
+    tabindex="0"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should use defaultActive: 0=inactive, 1=active 1`] = `
+<DocumentFragment>
+  <div
+    aria-controls="🅰3"
+    aria-disabled="false"
+    aria-selected="false"
+    role="tab"
+    tabindex="-1"
+  />
+  <div
+    aria-controls="🅰4"
+    aria-disabled="true"
+    aria-selected="true"
+    role="tab"
+    tabindex="0"
+  />
+  <div
+    aria-hidden="true"
+    id="🅰3"
+    style="visibility: hidden;"
+    tabindex="-1"
+  />
+  <div
+    aria-hidden="false"
+    id="🅰4"
+    style="visibility: visible;"
+    tabindex="0"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Tabs> should work with user-defined indexes: 0=inactive, 1=active 1`] = `
+<DocumentFragment>
+  <div
+    aria-controls="🅰9"
+    aria-disabled="true"
+    aria-selected="true"
+    data-index="1"
+    role="tab"
+    tabindex="0"
+  />
+  <div
+    aria-controls="🅰10"
+    aria-disabled="false"
+    aria-selected="false"
+    data-index="0"
+    role="tab"
+    tabindex="-1"
+  />
+  <div
+    aria-hidden="true"
+    data-index="0"
+    id="🅰10"
+    style="visibility: hidden;"
+    tabindex="-1"
+  />
+  <div
+    aria-hidden="false"
+    data-index="1"
+    id="🅰9"
+    style="visibility: visible;"
+    tabindex="0"
+  />
+</DocumentFragment>
+`;

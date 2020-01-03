@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react'
+import Button from '@accessible/button'
 import {useKeycodes} from '@accessible/use-keycode'
 import useConditionalFocus from '@accessible/use-conditional-focus'
 import useId from '@accessible/use-id'
@@ -65,7 +66,7 @@ const cloneChildrenWithIndex = (
 }
 
 export interface TabsContextValue {
-  tabs: TabState
+  tabs: TabState[]
   registerTab: (
     index: number,
     element: HTMLElement,
@@ -89,21 +90,16 @@ export interface TabsProps {
   defaultActive?: number
   manualActivation?: boolean
   onChange?: (active: number | undefined) => void
-  children:
-    | React.ReactElement
-    | React.ReactElement[]
-    | JSX.Element
-    | JSX.Element[]
+  children: React.ReactNode | React.ReactNode[] | JSX.Element | JSX.Element[]
 }
 
-export type TabState = (
+export type TabState =
   | {
       element?: HTMLElement
       id?: string
       disabled?: boolean
     }
   | undefined
-)[]
 
 type TabAction =
   | {
@@ -126,18 +122,10 @@ export const Tabs: React.FC<TabsProps> = ({
   children,
 }) => {
   const [tabs, dispatchTabs] = useReducer(
-    (state: TabState, action: TabAction) => {
+    (state: TabState[], action: TabAction) => {
       const {index} = action
 
       if (action.type === 'register') {
-        const current = state[index]
-        if (
-          current &&
-          action.element === current.element &&
-          action.id === current.id &&
-          action.disabled === current.disabled
-        )
-          return state
         state = state.slice(0)
         state[index] = {
           element: action.element,
@@ -157,15 +145,6 @@ export const Tabs: React.FC<TabsProps> = ({
   const nextActive = typeof active === 'undefined' ? userActive : active
   const prevActive = useRef<number | undefined>(nextActive)
 
-  if (__DEV__) {
-    if (nextActive === void 0) {
-      throw new Error(
-        `Tabs requires at least one tab to be active, but there were no active tabs. ` +
-          `Try setting a \`defaultActive\` property.`
-      )
-    }
-  }
-
   const context = useMemo(
     () => ({
       tabs,
@@ -179,7 +158,10 @@ export const Tabs: React.FC<TabsProps> = ({
         return () => dispatchTabs({type: 'unregister', index})
       },
       active: nextActive,
-      activate: setActive,
+      activate: index => {
+        if (tabs[index]?.disabled) return
+        setActive(index)
+      },
       manualActivation,
     }),
     [tabs, nextActive, manualActivation]
@@ -268,10 +250,6 @@ export const Tab: React.FC<TabProps> = ({
     triggerRef,
     useKeycodes(
       {
-        // space bar
-        32: activate,
-        // enter
-        13: activate,
         // right arrow
         39: () => focusNext(tabs, index as number),
         // left arrow
@@ -298,42 +276,48 @@ export const Tab: React.FC<TabProps> = ({
     [id, disabled]
   )
 
-  return cloneElement(children, {
-    'aria-controls': id,
-    'aria-selected': '' + isActive,
-    'aria-disabled': '' + (isActive || disabled),
-    role: 'tab',
-    className:
-      clsx(children.props.className, isActive ? activeClass : inactiveClass) ||
-      void 0,
-    style: Object.assign(
-      {},
-      children.props.style,
-      isActive ? activeStyle : inactiveStyle
-    ),
-    tabIndex: children.props.hasOwnProperty('tabIndex')
-      ? children.props.tabIndex
-      : isActive
-      ? 0
-      : -1,
-    onFocus: e => {
-      !manualActivation && activate()
-      children.props.onFocus?.(e)
-    },
-    onClick: e => {
-      activate()
-      children.props.onClick?.(e)
-    },
-    ref,
-  })
+  return (
+    <Button>
+      {cloneElement(children, {
+        'aria-controls': id,
+        'aria-selected': '' + isActive,
+        'aria-disabled': '' + (isActive || disabled),
+        role: 'tab',
+        className:
+          clsx(
+            children.props.className,
+            isActive ? activeClass : inactiveClass
+          ) || void 0,
+        style: Object.assign(
+          {},
+          children.props.style,
+          isActive ? activeStyle : inactiveStyle
+        ),
+        tabIndex: children.props.hasOwnProperty('tabIndex')
+          ? children.props.tabIndex
+          : isActive
+          ? 0
+          : -1,
+        onFocus: e => {
+          !manualActivation && activate()
+          children.props.onFocus?.(e)
+        },
+        onClick: e => {
+          activate()
+          children.props.onClick?.(e)
+        },
+        ref,
+      })}
+    </Button>
+  )
 }
 
-const focusNext = (tabs: TabState, currentIndex: number) => {
+const focusNext = (tabs: TabState[], currentIndex: number) => {
   if (currentIndex === tabs.length - 1) tabs[0]?.element?.focus()
   else tabs[currentIndex + 1]?.element?.focus()
 }
 
-const focusPrev = (tabs: TabState, currentIndex: number) => {
+const focusPrev = (tabs: TabState[], currentIndex: number) => {
   if (currentIndex === 0) tabs[tabs.length - 1]?.element?.focus()
   else tabs[currentIndex - 1]?.element?.focus()
 }
@@ -367,14 +351,13 @@ export const Panel: React.FC<PanelProps> = ({
   const {isActive, id} = useTab(index as number)
   const {manualActivation} = useTabs()
   const prevActive = useRef<boolean>(isActive)
-  const focusRef = useConditionalFocus(
-    manualActivation && !prevActive.current && isActive,
-    true
-  )
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
-    focusRef
+    useConditionalFocus(
+      manualActivation && !prevActive.current && isActive,
+      true
+    )
   )
   // ensures the tab panel won't be granted the window's focus
   // by default, but receives focus when the visual state changes to
@@ -396,7 +379,9 @@ export const Panel: React.FC<PanelProps> = ({
     ),
     tabIndex: children.props.hasOwnProperty('tabIndex')
       ? children.props.tabIndex
-      : 0,
+      : isActive
+      ? 0
+      : -1,
     ref,
   })
 }
