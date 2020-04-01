@@ -76,6 +76,7 @@ export interface TabsContextValue {
   active: number | undefined
   activate: (index: number | undefined) => void
   manualActivation: boolean
+  preventScroll: boolean
 }
 
 // @ts-ignore
@@ -89,6 +90,7 @@ export interface TabsProps {
   active?: number
   defaultActive?: number
   manualActivation?: boolean
+  preventScroll?: boolean
   onChange?: (active: number | undefined) => void
   children: React.ReactNode | React.ReactNode[] | JSX.Element | JSX.Element[]
 }
@@ -118,6 +120,7 @@ export const Tabs: React.FC<TabsProps> = ({
   active,
   defaultActive = 0,
   manualActivation = false,
+  preventScroll = false,
   onChange,
   children,
 }) => {
@@ -162,9 +165,10 @@ export const Tabs: React.FC<TabsProps> = ({
         if (tabs[index]?.disabled) return
         setActive(index)
       },
+      preventScroll,
       manualActivation,
     }),
-    [tabs, nextActive, manualActivation]
+    [tabs, nextActive, manualActivation, preventScroll]
   )
 
   useEffect(() => {
@@ -333,7 +337,6 @@ export const TabList: React.FC<TabListProps> = ({children}) =>
 
 export interface PanelProps {
   index?: number
-  preventScroll?: boolean
   activeClass?: string
   inactiveClass?: string
   activeStyle?: React.CSSProperties
@@ -343,7 +346,6 @@ export interface PanelProps {
 
 export const Panel: React.FC<PanelProps> = ({
   index,
-  preventScroll = false,
   activeClass,
   inactiveClass,
   activeStyle,
@@ -351,7 +353,7 @@ export const Panel: React.FC<PanelProps> = ({
   children,
 }) => {
   const {isActive, id} = useTab(index as number)
-  const {manualActivation} = useTabs()
+  const {manualActivation, preventScroll} = useTabs()
   const prevActive = useRef<boolean>(isActive)
   const ref = useMergedRef(
     // @ts-ignore

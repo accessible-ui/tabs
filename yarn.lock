@@ -15,10 +15,10 @@
   resolved "https://registry.yarnpkg.com/@accessible/tabbable/-/tabbable-1.0.4.tgz#23ffe8264b9c25c5b30c799e2893ca6d7cb60c24"
   integrity sha512-tujs+H5E0K7XoHE5dmNZut9RwdQTt4gmxd3KgXtM5tosKFQvNtAagYCQF8JsWJ9vtgugjk7uPrjZyWiYYaW1JA==
 
-"@accessible/use-conditional-focus@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@accessible/use-conditional-focus/-/use-conditional-focus-1.0.1.tgz#8d4f18d57b3c7c76434b6767148e710f46554409"
-  integrity sha512-XniSYQhRDUt//cVlWDXBM/q2tat6PU+BcoT1eoliKaPo5fo7U+ZgNK4PddsYloCik0hq8xmEF/t6J7b3aHNlpQ==
+"@accessible/use-conditional-focus@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@accessible/use-conditional-focus/-/use-conditional-focus-2.1.0.tgz#3104a8ba2b394ef03cf995b52cbc8773d144a234"
+  integrity sha512-EhMpAEnRC6I/HptnxeU6QRZ8vYkBre3KISqz7mr19OOzQMbVyCBhNuoNNAs2jvXxGRvz2eVP+p5sBVrpGVRK6g==
   dependencies:
     "@accessible/tabbable" "^1.0.4"
     "@react-hook/passive-layout-effect" "^1.0.2"
