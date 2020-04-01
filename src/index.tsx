@@ -356,11 +356,10 @@ export const Panel: React.FC<PanelProps> = ({
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
-    useConditionalFocus(
-      manualActivation && !prevActive.current && isActive,
-      true,
-      preventScroll
-    )
+    useConditionalFocus(manualActivation && !prevActive.current && isActive, {
+      includeRoot: true,
+      preventScroll,
+    })
   )
   // ensures the tab panel won't be granted the window's focus
   // by default, but receives focus when the visual state changes to
