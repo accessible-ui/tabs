@@ -333,6 +333,7 @@ export const TabList: React.FC<TabListProps> = ({children}) =>
 
 export interface PanelProps {
   index?: number
+  preventScroll?: boolean
   activeClass?: string
   inactiveClass?: string
   activeStyle?: React.CSSProperties
@@ -342,6 +343,7 @@ export interface PanelProps {
 
 export const Panel: React.FC<PanelProps> = ({
   index,
+  preventScroll = false,
   activeClass,
   inactiveClass,
   activeStyle,
@@ -354,10 +356,10 @@ export const Panel: React.FC<PanelProps> = ({
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
-    useConditionalFocus(
-      manualActivation && !prevActive.current && isActive,
-      true
-    )
+    useConditionalFocus(manualActivation && !prevActive.current && isActive, {
+      includeRoot: true,
+      preventScroll,
+    })
   )
   // ensures the tab panel won't be granted the window's focus
   // by default, but receives focus when the visual state changes to
