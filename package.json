@@ -1,6 +1,6 @@
 {
   "name": "@accessible/tabs",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/accessible-ui/tabs#readme",
   "repository": "github:accessible-ui/tabs",
   "bugs": "https://github.com/accessible-ui/tabs/issues",
@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@accessible/button": "^1.0.3",
-    "@accessible/use-conditional-focus": "^1.0.1",
+    "@accessible/use-conditional-focus": "^2.1.0",
     "@accessible/use-id": "^1.0.4",
     "@accessible/use-keycode": "^3.0.1",
     "@react-hook/merged-ref": "^1.0.8",
