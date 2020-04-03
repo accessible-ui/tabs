@@ -303,7 +303,9 @@ export const Tab: React.FC<TabProps> = ({
           ? 0
           : -1,
         onFocus: e => {
-          !manualActivation && activate()
+          if (!manualActivation) {
+            activate()
+          }
           children.props.onFocus?.(e)
         },
         onClick: e => {
