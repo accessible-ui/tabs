@@ -329,7 +329,7 @@ const focusPrev = (tabs: TabState[], currentIndex: number) => {
 }
 
 export interface TabListProps {
-  children: React.ReactElement
+  children: React.ReactElement | JSX.Element
 }
 
 export const TabList: React.FC<TabListProps> = ({children}) =>
@@ -343,7 +343,7 @@ export interface PanelProps {
   inactiveClass?: string
   activeStyle?: React.CSSProperties
   inactiveStyle?: React.CSSProperties
-  children: React.ReactElement
+  children: React.ReactElement | JSX.Element
 }
 
 export const Panel: React.FC<PanelProps> = ({
