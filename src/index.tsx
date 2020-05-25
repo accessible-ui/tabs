@@ -252,21 +252,18 @@ export const Tab: React.FC<TabProps> = ({
     // @ts-ignore
     children.ref,
     triggerRef,
-    useKeycodes(
-      {
-        // right arrow
-        39: () => focusNext(tabs, index as number),
-        // left arrow
-        37: () => focusPrev(tabs, index as number),
-        // home
-        36: () => tabs[0]?.element?.focus(),
-        // end
-        35: () => tabs[tabs.length - 1]?.element?.focus(),
-        // delete
-        46: onDelete,
-      },
-      [activate, tabs, index, onDelete]
-    )
+    useKeycodes({
+      // right arrow
+      39: () => focusNext(tabs, index as number),
+      // left arrow
+      37: () => focusPrev(tabs, index as number),
+      // home
+      36: () => tabs[0]?.element?.focus(),
+      // end
+      35: () => tabs[tabs.length - 1]?.element?.focus(),
+      // delete
+      46: onDelete,
+    })
   )
 
   useEffect(
