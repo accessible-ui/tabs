@@ -1,12 +1,4 @@
-import React, {
-  cloneElement,
-  useState,
-  useReducer,
-  useRef,
-  useMemo,
-  useEffect,
-  useContext,
-} from 'react'
+import * as React from 'react'
 import Button from '@accessible/button'
 import {useKeycodes} from '@accessible/use-keycode'
 import useConditionalFocus from '@accessible/use-conditional-focus'
@@ -14,9 +6,6 @@ import useId from '@accessible/use-id'
 import useMergedRef from '@react-hook/merged-ref'
 import useLayoutEffect from '@react-hook/passive-layout-effect'
 import clsx from 'clsx'
-
-const __DEV__ =
-  typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
 
 // An optimized function for adding an `index` prop to elements of a Tab or
 // Panel type. All tabs must be on the same child depth level as other tabs,
@@ -29,7 +18,7 @@ const cloneChildrenWithIndex = (
 ): React.ReactNode[] | React.ReactNode => {
   let index = 0
   let didUpdate = false
-  const children = React.Children.map(elements, child => {
+  const children = React.Children.map(elements, (child) => {
     // bails out if not an element object
     if (!React.isValidElement(child)) return child
     // bails out if certainly the wrong type
@@ -46,7 +35,7 @@ const cloneChildrenWithIndex = (
         return child
       } else {
         didUpdate = true
-        return cloneElement(child, {index: index++})
+        return React.cloneElement(child, {index: index++})
       }
     }
     // only checks the children if we're not on a depth with tabs/panels
@@ -55,14 +44,14 @@ const cloneChildrenWithIndex = (
       if (nextChildren === child.props.children) return child
       else {
         didUpdate = true
-        return cloneElement(child, void 0, nextChildren)
+        return React.cloneElement(child, void 0, nextChildren)
       }
     }
 
     return child
   })
 
-  return !didUpdate ? elements : children.length === 1 ? children[0] : children
+  return !didUpdate ? elements : children?.length === 1 ? children[0] : children
 }
 
 export interface TabsContextValue {
@@ -79,12 +68,18 @@ export interface TabsContextValue {
   preventScroll: boolean
 }
 
-// @ts-ignore
-export const TabsContext: React.Context<TabsContextValue> = React.createContext(
-    {}
-  ),
+const noop = () => {}
+
+export const TabsContext = React.createContext<TabsContextValue>({
+    tabs: [],
+    registerTab: () => noop,
+    active: void 0,
+    activate: noop,
+    manualActivation: false,
+    preventScroll: false,
+  }),
   {Consumer: TabsConsumer} = TabsContext,
-  useTabs = () => useContext<TabsContextValue>(TabsContext)
+  useTabs = () => React.useContext<TabsContextValue>(TabsContext)
 
 export interface TabsProps {
   active?: number
@@ -124,7 +119,7 @@ export const Tabs: React.FC<TabsProps> = ({
   onChange,
   children,
 }) => {
-  const [tabs, dispatchTabs] = useReducer(
+  const [tabs, dispatchTabs] = React.useReducer(
     (state: TabState[], action: TabAction) => {
       const {index} = action
 
@@ -144,11 +139,15 @@ export const Tabs: React.FC<TabsProps> = ({
     },
     []
   )
-  const [userActive, setActive] = useState<number | undefined>(defaultActive)
+  const [userActive, setActive] = React.useState<number | undefined>(
+    defaultActive
+  )
+  const storedOnChange = React.useRef(onChange)
+  storedOnChange.current = onChange
   const nextActive = typeof active === 'undefined' ? userActive : active
-  const prevActive = useRef<number | undefined>(nextActive)
+  const prevActive = React.useRef<number | undefined>(nextActive)
 
-  const context = useMemo(
+  const context = React.useMemo<TabsContextValue>(
     () => ({
       tabs,
       registerTab: (
@@ -161,8 +160,8 @@ export const Tabs: React.FC<TabsProps> = ({
         return () => dispatchTabs({type: 'unregister', index})
       },
       active: nextActive,
-      activate: index => {
-        if (tabs[index]?.disabled) return
+      activate: (index) => {
+        if (tabs[index || -1]?.disabled) return
         setActive(index)
       },
       preventScroll,
@@ -171,10 +170,10 @@ export const Tabs: React.FC<TabsProps> = ({
     [tabs, nextActive, manualActivation, preventScroll]
   )
 
-  useEffect(() => {
-    prevActive.current !== nextActive && onChange?.(nextActive)
-    prevActive.current = nextActive
-  }, [nextActive])
+  React.useEffect(() => {
+    prevActive.current !== userActive && storedOnChange.current?.(userActive)
+    prevActive.current = userActive
+  }, [userActive])
 
   return (
     <TabsContext.Provider value={context}>
@@ -196,10 +195,9 @@ interface TabContextValue {
   disabled: boolean
 }
 
-// @ts-ignore
 export const useTab = (index: number): TabContextValue => {
-    const {tabs, activate, active} = useContext(TabsContext)
-    return useMemo(
+    const {tabs, activate, active} = React.useContext(TabsContext)
+    return React.useMemo(
       () => ({
         id: tabs[index]?.id,
         tabRef: tabs[index]?.element,
@@ -208,7 +206,7 @@ export const useTab = (index: number): TabContextValue => {
         isActive: index === active,
         disabled: tabs[index]?.disabled || false,
       }),
-      [tabs, index, active]
+      [tabs, index, active, activate]
     )
   },
   useIsActive = (index: number) => useTab(index).isActive,
@@ -217,8 +215,6 @@ export const useTab = (index: number): TabContextValue => {
     const {activate} = useTab(index)
     return {activate}
   }
-
-const noop = () => {}
 
 export interface TabProps {
   id?: string
@@ -245,7 +241,7 @@ export const Tab: React.FC<TabProps> = ({
 }) => {
   id = useId(id)
   const {registerTab} = useTabs()
-  const triggerRef = useRef<HTMLElement>(null)
+  const triggerRef = React.useRef<HTMLElement>(null)
   const {tabs, manualActivation} = useTabs()
   const {isActive, activate} = useTab(index as number)
   const ref = useMergedRef(
@@ -266,7 +262,7 @@ export const Tab: React.FC<TabProps> = ({
     })
   )
 
-  useEffect(
+  React.useEffect(
     () =>
       registerTab(
         index as number,
@@ -274,12 +270,14 @@ export const Tab: React.FC<TabProps> = ({
         id,
         disabled
       ),
-    [id, disabled]
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id, disabled, index]
   )
 
   return (
     <Button>
-      {cloneElement(children, {
+      {React.cloneElement(children, {
         'aria-controls': id,
         'aria-selected': '' + isActive,
         'aria-disabled': '' + (isActive || disabled),
@@ -299,13 +297,11 @@ export const Tab: React.FC<TabProps> = ({
           : isActive
           ? 0
           : -1,
-        onFocus: e => {
-          if (!manualActivation) {
-            activate()
-          }
+        onFocus: (e: React.MouseEvent<HTMLElement>) => {
+          if (!manualActivation) activate()
           children.props.onFocus?.(e)
         },
-        onClick: e => {
+        onClick: (e: React.MouseEvent<HTMLElement>) => {
           activate()
           children.props.onClick?.(e)
         },
@@ -330,7 +326,7 @@ export interface TabListProps {
 }
 
 export const TabList: React.FC<TabListProps> = ({children}) =>
-  cloneElement(children, {
+  React.cloneElement(children, {
     role: 'tablist',
   })
 
@@ -353,7 +349,7 @@ export const Panel: React.FC<PanelProps> = ({
 }) => {
   const {isActive, id} = useTab(index as number)
   const {manualActivation, preventScroll} = useTabs()
-  const prevActive = useRef<boolean>(isActive)
+  const prevActive = React.useRef<boolean>(isActive)
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
@@ -369,7 +365,7 @@ export const Panel: React.FC<PanelProps> = ({
     prevActive.current = isActive
   }, [isActive, index])
 
-  return cloneElement(children, {
+  return React.cloneElement(children, {
     'aria-hidden': `${!isActive}`,
     id,
     className:
@@ -390,7 +386,7 @@ export const Panel: React.FC<PanelProps> = ({
 }
 
 /* istanbul ignore next */
-if (__DEV__) {
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
   Tabs.displayName = 'Tabs'
   TabList.displayName = 'TabList'
   Tab.displayName = 'Tab'

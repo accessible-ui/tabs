@@ -2,13 +2,8 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
 import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {Tabs, Tab, Panel, TabList, useControls} from './index'
-
-const click_ = fireEvent.click
-fireEvent.click = (...args) => {
-  fireEvent.mouseDown(...args)
-  return click_(...args)
-}
 
 describe('<Tabs>', () => {
   it('should render child tabs and panels', () => {
@@ -117,13 +112,13 @@ describe('<Tabs>', () => {
 
   it('should fire onChange when active tab changes', () => {
     const cb = jest.fn()
-    const {rerender} = render(
+    const result = render(
       <Tabs active={0} onChange={cb}>
         <Tab>
           <div />
         </Tab>
         <Tab>
-          <div />
+          <div data-testid="btn" />
         </Tab>
         <Panel>
           <div />
@@ -135,24 +130,7 @@ describe('<Tabs>', () => {
     )
 
     expect(cb).not.toBeCalled()
-
-    rerender(
-      <Tabs active={1} onChange={cb}>
-        <Tab>
-          <div />
-        </Tab>
-        <Tab>
-          <div />
-        </Tab>
-        <Panel>
-          <div />
-        </Panel>
-        <Panel>
-          <div />
-        </Panel>
-      </Tabs>
-    )
-
+    userEvent.click(result.getByTestId('btn'))
     expect(cb).toBeCalledWith(1)
   })
 
@@ -192,7 +170,7 @@ describe('<Tab>', () => {
     )
 
     expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
-    fireEvent.click(getByTestId('btn'))
+    userEvent.click(getByTestId('btn'))
     expect(getByTestId('btn').getAttribute('aria-selected')).toBe('true')
   })
 
@@ -210,7 +188,7 @@ describe('<Tab>', () => {
 
     expect(getByTestId('btn').getAttribute('aria-disabled')).toBe('true')
     expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
-    fireEvent.click(getByTestId('btn'))
+    userEvent.click(getByTestId('btn'))
     expect(getByTestId('btn').getAttribute('aria-disabled')).toBe('true')
     expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
   })
@@ -291,7 +269,7 @@ describe('<Tab>', () => {
     )
 
     expect(cb).not.toBeCalled()
-    fireEvent.click(getByTestId('btn'))
+    userEvent.click(getByTestId('btn'))
     expect(cb).toBeCalled()
   })
 
