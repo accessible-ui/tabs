@@ -288,9 +288,9 @@ describe('<Tab>', () => {
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {which: 39})
+    fireEvent.keyDown(getByTestId('btn1'), {key: 'ArrowRight'})
     expect(focus2).toBeCalledTimes(1)
-    fireEvent.keyDown(getByTestId('btn2'), {which: 39})
+    fireEvent.keyDown(getByTestId('btn2'), {key: 'ArrowRight'})
     expect(focus1).toBeCalledTimes(1)
   })
 
@@ -309,9 +309,9 @@ describe('<Tab>', () => {
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {which: 37})
+    fireEvent.keyDown(getByTestId('btn1'), {key: 'ArrowLeft'})
     expect(focus2).toBeCalledTimes(1)
-    fireEvent.keyDown(getByTestId('btn2'), {which: 37})
+    fireEvent.keyDown(getByTestId('btn2'), {key: 'ArrowLeft'})
     expect(focus1).toBeCalledTimes(1)
   })
 
@@ -329,7 +329,7 @@ describe('<Tab>', () => {
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn2'), {which: 36})
+    fireEvent.keyDown(getByTestId('btn2'), {key: 'Home'})
     expect(focus1).toBeCalledTimes(1)
   })
 
@@ -347,7 +347,7 @@ describe('<Tab>', () => {
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn2'), {which: 35})
+    fireEvent.keyDown(getByTestId('btn2'), {key: 'End'})
     expect(focus1).toBeCalledTimes(1)
   })
 
@@ -365,7 +365,7 @@ describe('<Tab>', () => {
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {which: 46})
+    fireEvent.keyDown(getByTestId('btn1'), {key: 'Delete'})
     expect(del).toBeCalledTimes(1)
   })
 

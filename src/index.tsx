@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Button from '@accessible/button'
-import {useKeycodes} from '@accessible/use-keycode'
+import {Button} from '@accessible/button'
+import useKey from '@accessible/use-key'
 import useConditionalFocus from '@accessible/use-conditional-focus'
 import useId from '@accessible/use-id'
 import useMergedRef from '@react-hook/merged-ref'
@@ -247,20 +247,21 @@ export const Tab: React.FC<TabProps> = ({
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
-    triggerRef,
-    useKeycodes({
-      // right arrow
-      39: () => focusNext(tabs, index as number),
-      // left arrow
-      37: () => focusPrev(tabs, index as number),
-      // home
-      36: () => tabs[0]?.element?.focus(),
-      // end
-      35: () => tabs[tabs.length - 1]?.element?.focus(),
-      // delete
-      46: onDelete,
-    })
+    triggerRef
   )
+
+  useKey(triggerRef, {
+    // right arrow
+    ArrowRight: () => focusNext(tabs, index as number),
+    // left arrow
+    ArrowLeft: () => focusPrev(tabs, index as number),
+    // home
+    Home: () => tabs[0]?.element?.focus(),
+    // end
+    End: () => tabs[tabs.length - 1]?.element?.focus(),
+    // delete
+    Delete: onDelete,
+  })
 
   React.useEffect(
     () =>
@@ -350,14 +351,22 @@ export const Panel: React.FC<PanelProps> = ({
   const {isActive, id} = useTab(index as number)
   const {manualActivation, preventScroll} = useTabs()
   const prevActive = React.useRef<boolean>(isActive)
+  const panelRef = React.useRef<HTMLElement>(null)
   const ref = useMergedRef(
     // @ts-ignore
     children.ref,
-    useConditionalFocus(manualActivation && !prevActive.current && isActive, {
+    panelRef
+  )
+
+  useConditionalFocus(
+    panelRef,
+    manualActivation && !prevActive.current && isActive,
+    {
       includeRoot: true,
       preventScroll,
-    })
+    }
   )
+
   // ensures the tab panel won't be granted the window's focus
   // by default, but receives focus when the visual state changes to
   // active
