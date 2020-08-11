@@ -131,7 +131,7 @@ describe('<Tabs>', () => {
 
     expect(cb).not.toBeCalled()
     userEvent.click(result.getByTestId('btn'))
-    expect(cb).toBeCalledWith(1)
+    expect(cb).toBeCalledWith(1, 0)
   })
 
   it('should work with user-defined indexes', () => {

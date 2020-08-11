@@ -5,6 +5,7 @@ import useConditionalFocus from '@accessible/use-conditional-focus'
 import useId from '@accessible/use-id'
 import useMergedRef from '@react-hook/merged-ref'
 import useLayoutEffect from '@react-hook/passive-layout-effect'
+import useChange from '@react-hook/change'
 import clsx from 'clsx'
 
 // An optimized function for adding an `index` prop to elements of a Tab or
@@ -116,7 +117,7 @@ export const Tabs: React.FC<TabsProps> = ({
   defaultActive = 0,
   manualActivation = false,
   preventScroll = false,
-  onChange,
+  onChange = noop,
   children,
 }) => {
   const [tabs, dispatchTabs] = React.useReducer(
@@ -142,10 +143,8 @@ export const Tabs: React.FC<TabsProps> = ({
   const [userActive, setActive] = React.useState<number | undefined>(
     defaultActive
   )
-  const storedOnChange = React.useRef(onChange)
-  storedOnChange.current = onChange
-  const nextActive = typeof active === 'undefined' ? userActive : active
-  const prevActive = React.useRef<number | undefined>(nextActive)
+  useChange(userActive, onChange)
+  const nextActive = active ?? userActive
 
   const context = React.useMemo<TabsContextValue>(
     () => ({
@@ -169,11 +168,6 @@ export const Tabs: React.FC<TabsProps> = ({
     }),
     [tabs, nextActive, manualActivation, preventScroll]
   )
-
-  React.useEffect(() => {
-    prevActive.current !== userActive && storedOnChange.current?.(userActive)
-    prevActive.current = userActive
-  }, [userActive])
 
   return (
     <TabsContext.Provider value={context}>
