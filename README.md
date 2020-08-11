@@ -82,7 +82,7 @@ const Component = () => (
 | [`useTabs()`](#usetabs)           | This hook returns the value of the [TabsContext object](#tabscontextvalue). |
 | [`useTab()`](#usetabindex-number) | This hook returns the value of the [TabContext object](#tabcontextvalue).   |
 
-### `<Tabs>`
+### &lt;Tabs&gt;
 
 This component creates the context for your tabs and contains some configuration options. You'll need to add
 [`<Tab>`](#tab) and [`<Panel>`](#panel) as children in order to actually create tabs.
@@ -98,7 +98,7 @@ This component creates the context for your tabs and contains some configuration
 | onChange         | `(active: number) => void` | `undefined` | No        | Called each time the active tab changes. It provides the active tab `index` as its only argument.                                                                                                                                       |
 | children         | `React.ReactNode[]`        | `undefined` | Yes       | You can define any children here with some caveats listed elsewhere.                                                                                                                                                                    |
 
-### `<TabList>`
+### &lt;TabList&gt;
 
 #### Props
 
@@ -106,7 +106,7 @@ This component creates the context for your tabs and contains some configuration
 | -------- | -------------------- | ----------- | --------- | -------------------------------------------------------------------------------- |
 | children | `React.ReactElement` | `undefined` | Yes       | The child is cloned by this component and given a property for `role='tablist'`. |
 
-### `<Tab>`
+### &lt;Tab&gt;
 
 This component clones any React element and turns it into a tab that controls the visible state of a [`<Panel>`](#panel). It must be a child of [`<Tabs>`](#tabs) and all
 tabs must be adjacent in the tree. Each tab has a corresponding [`<Panel>`](#panel) that shares the same index.
@@ -176,7 +176,7 @@ const MyTabs = () => (
 | onDelete      | `(event: KeyboardEvent) => void` | `undefined` | No        | This callback will fire if a user presses the `Delete` key on their keyboard when this tab (not the panel) is focused.                                                                                                                                        |
 | children      | `React.ReactElement`             | `undefined` | Yes       | The child is cloned by this component and has aria attributes injected into its props as well as keyboard event handlers for navigating between tabs.                                                                                                         |
 
-### `<Panel>`
+### &lt;Panel&gt;
 
 This component clones its child and turns it into a panel that corresponds to a [`<Tab>`](#tab) with the same
 index. All panels must be adjacent in the tree unless an `index` prop is defined. For example:
@@ -204,12 +204,12 @@ index. All panels must be adjacent in the tree unless an `index` prop is defined
 | index         | `number`              | `undefined` | No        | Setting an index here overrides the default index created when this component mounts. Indexes are used to match panels to their corresponding [`<Tab>`](#tab). I would recommend not setting this property and letting the library handle it automatically. |
 | children      | `React.ReactElement`  | `undefined` | Yes       | The child is cloned by this component and has aria attributes injected into its props and will have its visible state controlled by the [`<Tab>`](#tab) component with the same index.                                                                      |
 
-### `useTab(index: number)`
+### useTab(index: number)
 
 Returns [`TabContext object`](#tabcontextvalue) for the [`<Tab>`](#tab) corresponding to the provided `index`.
 It must be used within a child of [`<Tabs>`](#tabs).
 
-### `TabContextValue`
+### TabContextValue
 
 ```typescript
 interface TabContextValue {
@@ -228,11 +228,11 @@ interface TabContextValue {
 }
 ```
 
-### `useTabs()`
+### useTabs()
 
 This hook returns the value of the [TabsContext object](#tabscontextvalue). This hook must be within a child of [`<Tabs>`](#tabs).
 
-### `TabsContextValue`
+### TabsContextValue
 
 ```typescript
 interface TabsContextValue {
