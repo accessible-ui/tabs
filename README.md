@@ -1,11 +1,14 @@
-<hr>
-<div align="center">
-  <h1 align="center">
-    &lt;Tabs&gt;
-  </h1>
-</div>
+<hr/>
 
-<p align="center">
+# @accessible/tabs
+
+> 🅰 An accessible and versatile tabs component for React with keyboard navigation and labeling features taught in w3.org's WAI-ARIA tabs example
+
+```sh
+npm i @accessible/tabs
+```
+
+<p>
   <a href="https://bundlephobia.com/result?p=@accessible/tabs">
     <img alt="Bundlephobia" src="https://img.shields.io/bundlephobia/minzip/@accessible/tabs?style=for-the-badge&labelColor=24292e">
   </a>
@@ -15,8 +18,8 @@
   <a aria-label="Code coverage report" href="https://codecov.io/gh/accessible-ui/tabs">
     <img alt="Code coverage" src="https://img.shields.io/codecov/c/gh/accessible-ui/tabs?style=for-the-badge&labelColor=24292e">
   </a>
-  <a aria-label="Build status" href="https://travis-ci.org/accessible-ui/tabs">
-    <img alt="Build status" src="https://img.shields.io/travis/accessible-ui/tabs?style=for-the-badge&labelColor=24292e">
+  <a aria-label="Build status" href="https://travis-ci.com/accessible-ui/tabs">
+    <img alt="Build status" src="https://img.shields.io/travis/com/accessible-ui/tabs?style=for-the-badge&labelColor=24292e">
   </a>
   <a aria-label="NPM version" href="https://www.npmjs.com/package/@accessible/tabs">
     <img alt="NPM Version" src="https://img.shields.io/npm/v/@accessible/tabs?style=for-the-badge&labelColor=24292e">
@@ -26,15 +29,14 @@
   </a>
 </p>
 
-<pre align="center">npm i @accessible/tabs</pre>
-<hr>
+---
 
 An accessible and versatile tabs component for React modeled after
 the [WAI-ARIA example taught here](https://www.w3.org/TR/wai-aria-practices/examples/tabs/tabs-1/tabs.html).
 
 ## Quick Start
 
-[Check out the example on CodeSandbox](https://codesandbox.io/s/accessibletabs-example-0dw15)
+[Check out the example on **CodeSandbox**](https://codesandbox.io/s/accessibletabs-example-0dw15)
 
 ```jsx harmony
 import {Tabs, TabList, Tab, Panel} from '@accessible/tabs'
@@ -42,7 +44,7 @@ import {Tabs, TabList, Tab, Panel} from '@accessible/tabs'
 const Component = () => (
   <Tabs defaultActive={0} manualActivation>
     <TabList>
-      <div aria-label="Some research thing">
+      <div aria-label='Some research thing'>
         <Tab>
           <button>Abstract</button>
         </Tab>
@@ -75,13 +77,10 @@ const Component = () => (
 
 ### Hooks
 
-| Hook                                        | Description                                                                 |
-| ------------------------------------------- | --------------------------------------------------------------------------- |
-| [`useTabs()`](#usetabs)                     | This hook returns the value of the [TabsContext object](#tabscontextvalue). |
-| [`useTab()`](#usetabindex-number)           | This hook returns the value of the [TabContext object](#tabcontextvalue).   |
-| [`useControls()`](#usecontrolsindex-number) | This hook returns a [`<Tab>`'s](#tab) `activate` function.                  |
-| [`useDisabled()`](#usedisabledindex-number) | This hook returns a [`<Tab>`'s](#tab) `disabled` value.                     |
-| [`useIsActive()`](#useisactiveindex-number) | This hook returns a [`<Tab>`'s](#tab) `isActive` value.                     |
+| Hook                              | Description                                                                 |
+| --------------------------------- | --------------------------------------------------------------------------- |
+| [`useTabs()`](#usetabs)           | This hook returns the value of the [TabsContext object](#tabscontextvalue). |
+| [`useTab()`](#usetabindex-number) | This hook returns the value of the [TabContext object](#tabcontextvalue).   |
 
 ### `<Tabs>`
 
@@ -228,21 +227,6 @@ interface TabContextValue {
   disabled: boolean
 }
 ```
-
-### `useIsActive(index: number)`
-
-Returns `true` if the [`<Tab>`](#tab) at the provided `index` is currently active. It must be used within a child
-of [`<Tabs>`](#tabs).
-
-### `useDisabled(index: number)`
-
-Returns `true` if the [`<Tab>`](#tab) at the provided `index` is currently disabled. It must be used within a child
-of [`<Tabs>`](#tabs).
-
-### `useControls(index: number)`
-
-Returns the `activate` control for the [`<Tab>`](#tab) at the provided `index`. It must be used within a child
-of [`<Tabs>`](#tabs).
 
 ### `useTabs()`
 

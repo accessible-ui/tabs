@@ -1,9 +1,9 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* jest */
 import React from 'react'
-import {renderHook} from '@testing-library/react-hooks'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {Tabs, Tab, Panel, TabList, useControls} from './index'
+import {Tabs, Tab, Panel, TabList} from './index'
 
 describe('<Tabs>', () => {
   it('should render child tabs and panels', () => {
@@ -112,13 +112,13 @@ describe('<Tabs>', () => {
 
   it('should fire onChange when active tab changes', () => {
     const cb = jest.fn()
-    const result = render(
+    render(
       <Tabs active={0} onChange={cb}>
         <Tab>
           <div />
         </Tab>
         <Tab>
-          <div data-testid="btn" />
+          <div data-testid='btn' />
         </Tab>
         <Panel>
           <div />
@@ -130,7 +130,7 @@ describe('<Tabs>', () => {
     )
 
     expect(cb).not.toBeCalled()
-    userEvent.click(result.getByTestId('btn'))
+    userEvent.click(screen.getByTestId('btn'))
     expect(cb).toBeCalledWith(1, 0)
   })
 
@@ -158,118 +158,120 @@ describe('<Tabs>', () => {
 
 describe('<Tab>', () => {
   it('should activate on click', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
           <div />
         </Tab>
         <Tab>
-          <div data-testid="btn" />
+          <div data-testid='btn' />
         </Tab>
       </Tabs>
     )
 
-    expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
-    userEvent.click(getByTestId('btn'))
-    expect(getByTestId('btn').getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-selected', 'false')
+    userEvent.click(screen.getByTestId('btn'))
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-selected', 'true')
   })
 
   it('should not activate if disabled', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
           <div />
         </Tab>
         <Tab disabled>
-          <div data-testid="btn" />
+          <div data-testid='btn' />
         </Tab>
       </Tabs>
     )
 
-    expect(getByTestId('btn').getAttribute('aria-disabled')).toBe('true')
-    expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
-    userEvent.click(getByTestId('btn'))
-    expect(getByTestId('btn').getAttribute('aria-disabled')).toBe('true')
-    expect(getByTestId('btn').getAttribute('aria-selected')).toBe('false')
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-selected', 'false')
+    userEvent.click(screen.getByTestId('btn'))
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByTestId('btn')).toHaveAttribute('aria-selected', 'false')
   })
 
   it('should apply activeClass/inactiveClass', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
-        <Tab activeClass="active">
-          <div data-testid="btn1" className="tab" />
+        <Tab activeClass='active'>
+          <div data-testid='btn1' className='tab' />
         </Tab>
-        <Tab inactiveClass="inactive">
-          <div data-testid="btn2" className="tab" />
+        <Tab inactiveClass='inactive'>
+          <div data-testid='btn2' className='tab' />
         </Tab>
       </Tabs>
     )
 
-    expect(getByTestId('btn1').getAttribute('class')).toBe('tab active')
-    expect(getByTestId('btn2').getAttribute('class')).toBe('tab inactive')
+    expect(screen.getByTestId('btn1')).toHaveAttribute('class', 'tab active')
+    expect(screen.getByTestId('btn2')).toHaveAttribute('class', 'tab inactive')
   })
 
   it('should apply activeStyle/inactiveStyle', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab activeStyle={{display: 'block'}}>
-          <div data-testid="btn1" style={{opacity: 0.5}} />
+          <div data-testid='btn1' style={{opacity: 0.5}} />
         </Tab>
         <Tab inactiveStyle={{display: 'none'}}>
-          <div data-testid="btn2" style={{opacity: 0.5}} />
+          <div data-testid='btn2' style={{opacity: 0.5}} />
         </Tab>
       </Tabs>
     )
 
-    expect(getByTestId('btn1').getAttribute('style')).toEqual(
+    expect(screen.getByTestId('btn1')).toHaveAttribute(
+      'style',
       'opacity: 0.5; display: block;'
     )
-    expect(getByTestId('btn2').getAttribute('style')).toEqual(
+    expect(screen.getByTestId('btn2')).toHaveAttribute(
+      'style',
       'opacity: 0.5; display: none;'
     )
   })
 
   it('should allow user-defined tabIndex', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <div tabIndex={2} data-testid="btn" />
+          <div tabIndex={2} data-testid='btn' />
         </Tab>
       </Tabs>
     )
 
-    expect(getByTestId('btn').getAttribute('tabindex')).toEqual('2')
+    expect(screen.getByTestId('btn')).toHaveAttribute('tabindex', '2')
   })
 
   it('should fire user-defined onFocus', () => {
     const cb = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <div onFocus={cb} data-testid="btn" />
+          <div onFocus={cb} data-testid='btn' />
         </Tab>
       </Tabs>
     )
 
     expect(cb).not.toBeCalled()
-    fireEvent.focus(getByTestId('btn'))
+    fireEvent.focus(screen.getByTestId('btn'))
     expect(cb).toBeCalled()
   })
 
   it('should fire user-defined onClick', () => {
     const cb = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <div onClick={cb} data-testid="btn" />
+          <div onClick={cb} data-testid='btn' />
         </Tab>
       </Tabs>
     )
 
     expect(cb).not.toBeCalled()
-    userEvent.click(getByTestId('btn'))
+    userEvent.click(screen.getByTestId('btn'))
     expect(cb).toBeCalled()
   })
 
@@ -277,20 +279,20 @@ describe('<Tab>', () => {
     const focus1 = jest.fn()
     const focus2 = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <button data-testid="btn1" onFocus={focus1} />
+          <button data-testid='btn1' onFocus={focus1} />
         </Tab>
         <Tab>
-          <button data-testid="btn2" onFocus={focus2} />
+          <button data-testid='btn2' onFocus={focus2} />
         </Tab>
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {key: 'ArrowRight'})
+    fireEvent.keyDown(screen.getByTestId('btn1'), {key: 'ArrowRight'})
     expect(focus2).toBeCalledTimes(1)
-    fireEvent.keyDown(getByTestId('btn2'), {key: 'ArrowRight'})
+    fireEvent.keyDown(screen.getByTestId('btn2'), {key: 'ArrowRight'})
     expect(focus1).toBeCalledTimes(1)
   })
 
@@ -298,74 +300,74 @@ describe('<Tab>', () => {
     const focus1 = jest.fn()
     const focus2 = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <button data-testid="btn1" onFocus={focus1} />
+          <button data-testid='btn1' onFocus={focus1} />
         </Tab>
         <Tab>
-          <button data-testid="btn2" onFocus={focus2} />
+          <button data-testid='btn2' onFocus={focus2} />
         </Tab>
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {key: 'ArrowLeft'})
+    fireEvent.keyDown(screen.getByTestId('btn1'), {key: 'ArrowLeft'})
     expect(focus2).toBeCalledTimes(1)
-    fireEvent.keyDown(getByTestId('btn2'), {key: 'ArrowLeft'})
+    fireEvent.keyDown(screen.getByTestId('btn2'), {key: 'ArrowLeft'})
     expect(focus1).toBeCalledTimes(1)
   })
 
   it('should focus first tab on home key', () => {
     const focus1 = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs defaultActive={1}>
         <Tab>
-          <button data-testid="btn1" onFocus={focus1} />
+          <button data-testid='btn1' onFocus={focus1} />
         </Tab>
         <Tab>
-          <button data-testid="btn2" />
+          <button data-testid='btn2' />
         </Tab>
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn2'), {key: 'Home'})
+    fireEvent.keyDown(screen.getByTestId('btn2'), {key: 'Home'})
     expect(focus1).toBeCalledTimes(1)
   })
 
   it('should focus last tab on end key', () => {
     const focus1 = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab>
-          <button data-testid="btn1" />
+          <button data-testid='btn1' />
         </Tab>
         <Tab>
-          <button data-testid="btn2" onFocus={focus1} />
+          <button data-testid='btn2' onFocus={focus1} />
         </Tab>
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn2'), {key: 'End'})
+    fireEvent.keyDown(screen.getByTestId('btn2'), {key: 'End'})
     expect(focus1).toBeCalledTimes(1)
   })
 
   it('should fire onDelete on delete key', () => {
     const del = jest.fn()
 
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Tab onDelete={del}>
-          <button data-testid="btn1" />
+          <button data-testid='btn1' />
         </Tab>
         <Tab>
-          <button data-testid="btn2" />
+          <button data-testid='btn2' />
         </Tab>
       </Tabs>
     )
 
-    fireEvent.keyDown(getByTestId('btn1'), {key: 'Delete'})
+    fireEvent.keyDown(screen.getByTestId('btn1'), {key: 'Delete'})
     expect(del).toBeCalledTimes(1)
   })
 
@@ -373,10 +375,10 @@ describe('<Tab>', () => {
     const {rerender, asFragment} = render(
       <Tabs>
         <Tab>
-          <button data-testid="btn1" />
+          <button data-testid='btn1' />
         </Tab>
         <Tab>
-          <button data-testid="btn2" />
+          <button data-testid='btn2' />
         </Tab>
       </Tabs>
     )
@@ -386,7 +388,7 @@ describe('<Tab>', () => {
     rerender(
       <Tabs>
         <Tab>
-          <button data-testid="btn2" />
+          <button data-testid='btn2' />
         </Tab>
       </Tabs>
     )
@@ -397,51 +399,56 @@ describe('<Tab>', () => {
 
 describe('<Panel>', () => {
   it('should apply activeClass/inactiveClass', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
-        <Panel activeClass="active">
-          <div data-testid="panel1" className="tab" />
+        <Panel activeClass='active'>
+          <div data-testid='panel1' className='tab' />
         </Panel>
-        <Panel inactiveClass="inactive">
-          <div data-testid="panel2" className="tab" />
+        <Panel inactiveClass='inactive'>
+          <div data-testid='panel2' className='tab' />
         </Panel>
       </Tabs>
     )
 
-    expect(getByTestId('panel1').getAttribute('class')).toBe('tab active')
-    expect(getByTestId('panel2').getAttribute('class')).toBe('tab inactive')
+    expect(screen.getByTestId('panel1')).toHaveAttribute('class', 'tab active')
+    expect(screen.getByTestId('panel2')).toHaveAttribute(
+      'class',
+      'tab inactive'
+    )
   })
 
   it('should apply activeStyle/inactiveStyle', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Panel activeStyle={{display: 'block'}}>
-          <div data-testid="panel1" style={{opacity: 0.5}} />
+          <div data-testid='panel1' style={{opacity: 0.5}} />
         </Panel>
         <Panel inactiveStyle={{display: 'none'}}>
-          <div data-testid="panel2" style={{opacity: 0.5}} />
+          <div data-testid='panel2' style={{opacity: 0.5}} />
         </Panel>
       </Tabs>
     )
 
-    expect(getByTestId('panel1').getAttribute('style')).toEqual(
+    expect(screen.getByTestId('panel1')).toHaveAttribute(
+      'style',
       'visibility: visible; opacity: 0.5; display: block;'
     )
-    expect(getByTestId('panel2').getAttribute('style')).toEqual(
+    expect(screen.getByTestId('panel2')).toHaveAttribute(
+      'style',
       'visibility: hidden; opacity: 0.5; display: none;'
     )
   })
 
   it('should allow user-defined tabIndex', () => {
-    const {getByTestId} = render(
+    render(
       <Tabs>
         <Panel>
-          <div tabIndex={2} data-testid="panel" />
+          <div tabIndex={2} data-testid='panel' />
         </Panel>
       </Tabs>
     )
 
-    expect(getByTestId('panel').getAttribute('tabindex')).toEqual('2')
+    expect(screen.getByTestId('panel')).toHaveAttribute('tabindex', '2')
   })
 })
 
@@ -454,22 +461,5 @@ describe('<TabList>', () => {
         </TabList>
       ).asFragment()
     ).toMatchSnapshot()
-  })
-})
-
-describe('useControls()', () => {
-  it('should have activate key', () => {
-    const {result} = renderHook(() => useControls(0), {
-      wrapper: ({children}) => (
-        <Tabs>
-          <Tab>
-            <div />
-          </Tab>
-          {children as React.ReactElement}
-        </Tabs>
-      ),
-    })
-
-    expect(Object.keys(result.current)).toStrictEqual(['activate'])
   })
 })

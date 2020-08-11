@@ -69,7 +69,7 @@ export interface TabsContextValue {
   preventScroll: boolean
 }
 
-const noop = () => {}
+function noop() {}
 
 export const TabsContext = React.createContext<TabsContextValue>({
     tabs: [],
@@ -112,14 +112,14 @@ type TabAction =
       index: number
     }
 
-export const Tabs: React.FC<TabsProps> = ({
+export function Tabs({
   active,
   defaultActive = 0,
   manualActivation = false,
   preventScroll = false,
   onChange = noop,
   children,
-}) => {
+}: TabsProps) {
   const [tabs, dispatchTabs] = React.useReducer(
     (state: TabState[], action: TabAction) => {
       const {index} = action
@@ -189,26 +189,20 @@ interface TabContextValue {
   disabled: boolean
 }
 
-export const useTab = (index: number): TabContextValue => {
-    const {tabs, activate, active} = React.useContext(TabsContext)
-    return React.useMemo(
-      () => ({
-        id: tabs[index]?.id,
-        tabRef: tabs[index]?.element,
-        index: index as number,
-        activate: () => !tabs[index]?.disabled && activate(index),
-        isActive: index === active,
-        disabled: tabs[index]?.disabled || false,
-      }),
-      [tabs, index, active, activate]
-    )
-  },
-  useIsActive = (index: number) => useTab(index).isActive,
-  useDisabled = (index: number) => useTab(index).disabled,
-  useControls = (index: number): TabControls => {
-    const {activate} = useTab(index)
-    return {activate}
-  }
+export function useTab(index: number): TabContextValue {
+  const {tabs, activate, active} = React.useContext(TabsContext)
+  return React.useMemo(
+    () => ({
+      id: tabs[index]?.id,
+      tabRef: tabs[index]?.element,
+      index: index as number,
+      activate: () => !tabs[index]?.disabled && activate(index),
+      isActive: index === active,
+      disabled: tabs[index]?.disabled || false,
+    }),
+    [tabs, index, active, activate]
+  )
+}
 
 export interface TabProps {
   id?: string
@@ -222,7 +216,7 @@ export interface TabProps {
   children: React.ReactElement | JSX.Element
 }
 
-export const Tab: React.FC<TabProps> = ({
+export function Tab({
   id,
   index,
   disabled = false,
@@ -232,7 +226,7 @@ export const Tab: React.FC<TabProps> = ({
   inactiveStyle,
   onDelete = noop,
   children,
-}) => {
+}: TabProps) {
   id = useId(id)
   const {registerTab} = useTabs()
   const triggerRef = React.useRef<HTMLElement>(null)
@@ -306,12 +300,12 @@ export const Tab: React.FC<TabProps> = ({
   )
 }
 
-const focusNext = (tabs: TabState[], currentIndex: number) => {
+function focusNext(tabs: TabState[], currentIndex: number) {
   if (currentIndex === tabs.length - 1) tabs[0]?.element?.focus()
   else tabs[currentIndex + 1]?.element?.focus()
 }
 
-const focusPrev = (tabs: TabState[], currentIndex: number) => {
+function focusPrev(tabs: TabState[], currentIndex: number) {
   if (currentIndex === 0) tabs[tabs.length - 1]?.element?.focus()
   else tabs[currentIndex - 1]?.element?.focus()
 }
@@ -320,10 +314,11 @@ export interface TabListProps {
   children: React.ReactElement | JSX.Element
 }
 
-export const TabList: React.FC<TabListProps> = ({children}) =>
-  React.cloneElement(children, {
+export function TabList({children}: TabListProps) {
+  return React.cloneElement(children, {
     role: 'tablist',
   })
+}
 
 export interface PanelProps {
   index?: number
@@ -334,14 +329,14 @@ export interface PanelProps {
   children: React.ReactElement | JSX.Element
 }
 
-export const Panel: React.FC<PanelProps> = ({
+export function Panel({
   index,
   activeClass,
   inactiveClass,
   activeStyle,
   inactiveStyle,
   children,
-}) => {
+}: PanelProps) {
   const {isActive, id} = useTab(index as number)
   const {manualActivation, preventScroll} = useTabs()
   const prevActive = React.useRef<boolean>(isActive)
